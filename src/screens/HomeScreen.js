@@ -4,7 +4,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  ActivityIndicator,
+  ActivityIndicator, AsyncStorage,
 } from "react-native";
 import {
   Card,
@@ -16,20 +16,23 @@ import {
 } from "react-native-elements";
 import PostCard from "./../components/PostCard";
 import { AntDesign, Entypo } from "@expo/vector-icons";
-import { AuthContext } from "../providers/AuthProvider";
+import { AuthContext, AuthProvider } from "../providers/AuthProvider";
 import { getPosts } from "./../requests/Posts";
 import { getUsers } from "./../requests/Users";
+import {storePost, getPost} from "../functions/AsyncStorageFunctions";
 
 const HomeScreen = (props) => {
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [post, setPost] = useState("Empty");
+
 
   const loadPosts = async () => {
     setLoading(true);
-    const response = await getPosts();
-    if (response.ok) {
-      setPosts(response.data);
+    const response = JSON.parse(await AsyncStorage.getItem("post"));
+    if (response != null) {
+      setPosts(response);
     }
   };
 
@@ -66,7 +69,7 @@ const HomeScreen = (props) => {
                   props.navigation.toggleDrawer();
                 },
               }}
-              centerComponent={{ text: "The Office", style: { color: "#fff" } }}
+              centerComponent={{ text: "The Blogger", style: { color: "#fff" } }}
               rightComponent={{
                 icon: "lock-outline",
                 color: "#fff",
@@ -80,8 +83,24 @@ const HomeScreen = (props) => {
               <Input
                 placeholder="What's On Your Mind?"
                 leftIcon={<Entypo name="pencil" size={24} color="black" />}
+                onChangeText={function (currentInput) {
+                  setPost(currentInput);
+                }}
               />
-              <Button title="Post" type="outline" onPress={function () {}} />
+              <Button title="Post" type="outline" onPress={async function ()  {
+
+                let name  = await AsyncStorage.getItem("myname")
+                let value = {
+                  postedBy: name,
+                  text: post,
+                  postID: Date.now()
+                }
+
+
+                storePost("post", value)
+                getPost("post")
+                console.log("posted")
+              }} />
             </Card>
 
             <FlatList
@@ -89,9 +108,12 @@ const HomeScreen = (props) => {
               renderItem={function ({ item }) {
                 return (
                   <PostCard
-                    author={getName(item.userId)}
-                    title={item.title}
-                    body={item.body}
+                    author={item.postedBy}
+                    title={item.postID}
+                    body={item.text}
+                    onPress={function(){
+                      console.log("navigate to post details")
+                    }}
                   />
                 );
               }}

@@ -26,19 +26,19 @@ const ProfileScreen = (props) => {
             }}
           />
           <Card>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Avatar
                 containerStyle={{ backgroundColor: "cyan" }}
                 rounded
                 icon={{
-                  name: "thumbs-o-up",
+                  name: "user",
                   type: "font-awesome",
                   color: "black",
                 }}
                 activeOpacity={1}
               />
               <Text style={{ paddingHorizontal: 10 }}>
-                {auth.CurrentUser.name} Liked Your Post.
+                {auth.CurrentUser.name}
               </Text>
             </View>
           </Card>
