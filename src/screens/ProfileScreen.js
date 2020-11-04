@@ -28,17 +28,20 @@ const ProfileScreen = (props) => {
           <Card>
             <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Avatar
+                  size={"xlarge"}
                 containerStyle={{ backgroundColor: "cyan" }}
                 rounded
                 icon={{
                   name: "user",
                   type: "font-awesome",
                   color: "black",
+                  size:50,
                 }}
                 activeOpacity={1}
               />
               <Text style={{ paddingHorizontal: 10 }}>
-                {auth.CurrentUser.name}
+                {"Name: "+auth.CurrentUser.name}
+                {"\nEmail: "+auth.CurrentUser.email}
               </Text>
             </View>
           </Card>
