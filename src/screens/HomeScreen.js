@@ -20,6 +20,8 @@ import {AuthContext, AuthProvider} from "../providers/AuthProvider";
 import {getPosts} from "./../requests/Posts";
 import {getUsers} from "./../requests/Users";
 import {storePost, getPost} from "../functions/AsyncStorageFunctions";
+import firebase from "firebase/app";
+
 
 const HomeScreen = (props) => {
     const [posts, setPosts] = useState([]);
