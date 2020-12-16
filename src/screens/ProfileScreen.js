@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, AsyncStorage } from "react-native";
 import { Text, Card, Button, Avatar, Header } from "react-native-elements";
 import { AuthContext } from "../providers/AuthProvider";
+import * as firebase from "firebase";
 const ProfileScreen = (props) => {
   return (
     <AuthContext.Consumer>
@@ -40,8 +41,8 @@ const ProfileScreen = (props) => {
                 activeOpacity={1}
               />
               <Text style={{ paddingHorizontal: 10 }}>
-                {"Name: "+auth.CurrentUser.name}
-                {"\nEmail: "+auth.CurrentUser.email}
+                {"Name: "+firebase.auth().currentUser.displayName}
+                {"\nEmail: "+firebase.auth().currentUser.email}
               </Text>
             </View>
           </Card>

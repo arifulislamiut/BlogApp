@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import CommentCard from "../components/CommentCard";
 import {Entypo} from "@expo/vector-icons";
 import {getPost, storePost} from "../functions/AsyncStorageFunctions";
+import * as firebase from "firebase";
 
 const PostScreen = ({route}) => {
     const [comments, setComments] = useState([]);
@@ -13,24 +14,37 @@ const PostScreen = ({route}) => {
     const [post, setPost] = useState("Empty");
 
     const key = "comments" + route.params.title
-    const notiKey = "noti"+ route.params.author
-
-
+    const notiKey = "noti" + route.params.author
     const loadComment = async () => {
         setLoading(true);
-        const response = JSON.parse(await AsyncStorage.getItem(key));
-        if (response != null) {
-            setComments(response);
-        }
+        firebase.database().ref("Posts").child(route.params.title).child("comments").on('value', (snap)=>{
+
+            let posts = []
+            snap.forEach(function (post){
+
+                let pos = {
+                    commentID: post.val().commentID,
+                    postedBy: post.val().postedBy,
+                    comment: post.val().comment
+                }
+                posts.push(pos)
+            })
+            setComments(posts)
+        })
+
         setLoading((false))
     };
 
     useEffect(() => {
-        loadComment();
+        loadComment().then(r => {
+            console.log("ok")
+        }).catch((e)=>{
+            console.log(e)
+        })
     }, []);
 
 
-    if(!loading) {
+    if (!loading) {
         return (
             <AuthContext.Consumer>
                 {(auth) => (
@@ -51,30 +65,28 @@ const PostScreen = ({route}) => {
                             />
                             <Button title="Post" type="outline" onPress={async function () {
 
-                                let name = await AsyncStorage.getItem("myname")
+                                let name = firebase.auth().currentUser.displayName
+                                let cid = Date.now()
                                 let value = {
                                     postedBy: name,
                                     comment: post,
-                                    commentID: Date.now()
+                                    commentID: cid
                                 }
 
                                 const noti = {
                                     postedBy: name,
                                     type: "Comment",
-                                    author:route.params.author,
-                                    title:route.params.title,
-                                    body:route.params.body,
+                                    author: route.params.author,
+                                    title: route.params.title,
+                                    body: route.params.body,
                                 }
+                                firebase.database().ref("Users").child(route.params.title).child("comments").child(cid.toString()).update(value).then(() => {
+                                    alert("Comment added : " + cid)
+                                }).catch((error) => {
+                                    alert(error)
+                                })
 
-                                console.log("saving as " +key + value)
-
-                                await storePost(notiKey, noti)
-
-                                console.log("saving as "+ notiKey )
-                                console.log(await getPost(notiKey))
-                                console.log("get as "+ notiKey )
-                                await storePost(key, value)
-                                loadComment()
+                                await loadComment()
                             }}/>
                         </Card>
 
@@ -94,7 +106,7 @@ const PostScreen = ({route}) => {
                 )}
             </AuthContext.Consumer>
         );
-    }else {
+    } else {
         return (
             <View style={{flex: 1, justifyContent: "center"}}>
                 <ActivityIndicator size="large" color="red" animating={true}/>

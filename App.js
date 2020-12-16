@@ -12,11 +12,26 @@ import PostScreen from "./src/screens/PostScreen";
 
 import {AuthContext, AuthProvider} from "./src/providers/AuthProvider";
 import {Entypo, AntDesign, Ionicons} from "@expo/vector-icons";
+import * as firebase from "firebase";
 
 const AuthStack = createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();
 const AppDrawer = createDrawerNavigator();
 const PostStack = createStackNavigator();
+
+var firebaseConfig = {
+    apiKey: "AIzaSyBGikc92NLo5zUeKTV7LUruY2LRcqQIzlY",
+    authDomain: "blogapp-a9ee9.firebaseapp.com",
+    databaseURL: "https://blogapp-a9ee9-default-rtdb.firebaseio.com",
+    projectId: "blogapp-a9ee9",
+    storageBucket: "blogapp-a9ee9.appspot.com",
+    messagingSenderId: "660384679096",
+    appId: "1:660384679096:web:4e505a0c0964b111af604d",
+    measurementId: "G-ZL9KP1XRZM"
+};
+if(!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 const AppDrawerScreen = () => {
     return (

@@ -3,7 +3,7 @@ import {View, StyleSheet, AsyncStorage} from "react-native";
 import { Input, Button, Card } from "react-native-elements";
 import { FontAwesome, Feather, AntDesign } from "@expo/vector-icons";
 import { AuthContext } from "../providers/AuthProvider";
-import { getDataJSON } from "../functions/AsyncStorageFunctions";
+import * as firebase from "firebase";
 
 const SignInScreen = (props) => {
   const [Email, setEmail] = useState("");
@@ -26,7 +26,6 @@ const SignInScreen = (props) => {
             <Input
               placeholder="Password"
               leftIcon={<Feather name="key" size={24} color="black" />}
-              secureTextEntry={true}
               onChangeText={function (currentInput) {
                 setPassword(currentInput);
               }}
@@ -37,14 +36,15 @@ const SignInScreen = (props) => {
               title="  Sign In!"
               type="solid"
               onPress={async function () {
-                let UserData = await getDataJSON(Email);
-                if (UserData.password == Password) {
-                  auth.setIsLoggedIn(true);
-                  auth.setCurrentUser(UserData);
-                  await AsyncStorage.setItem("myname", Email)
+                if (Email && Password) {
+                  firebase.auth().signInWithEmailAndPassword(Email, Password).then((userCreds)=>{
+                    auth.setIsLoggedIn(true)
+                    auth.setCurrentUser(userCreds.user)
+                  }).catch((error)=>{
+                    alert(error)
+                  })
                 } else {
-                  alert("Login Failed");
-                  console.log(UserData);
+                  alert("Field can't be empty");
                 }
               }}
             />

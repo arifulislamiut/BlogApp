@@ -14,7 +14,6 @@ const PostCard = (props) => {
     const key = "like" + props.title
     const notiKey = "noti"+ props.author
 
-    console.log("Noti key    dkfd  fjkjdsjf fjf" +notiKey)
 
     return (
         <Card>
@@ -66,7 +65,6 @@ const PostCard = (props) => {
 
                         await storePost(notiKey, noti)
 
-                        console.log(await getPost(notiKey))
                         await storePost(key, value)
                     }}
                     icon={<AntDesign name="like2" size={24} color="dodgerblue"/>}

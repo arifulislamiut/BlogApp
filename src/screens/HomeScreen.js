@@ -30,10 +30,22 @@ const HomeScreen = (props) => {
 
     const loadPosts = async () => {
         setLoading(true);
-        const response = JSON.parse(await AsyncStorage.getItem("post"));
-        if (response != null) {
-            setPosts(response);
-        }
+
+        firebase.database().ref("Posts").on('value', (snap)=>{
+
+            let posts = []
+            snap.forEach(function (post){
+                let pos = {
+                    postID: post.val().postID,
+                    postedBy: post.val().postedBy,
+                    text: post.val().text
+                }
+                posts.push(pos)
+            })
+
+            setPosts(posts)
+
+        })
         setLoading((false))
     };
 
@@ -59,8 +71,12 @@ const HomeScreen = (props) => {
                                 icon: "lock-outline",
                                 color: "#fff",
                                 onPress: function () {
-                                    auth.setIsLoggedIn(false);
-                                    auth.setCurrentUser({});
+                                    firebase.auth().signOut().then(()=>{
+                                        auth.setIsLoggedIn(false);
+                                        auth.setCurrentUser({});
+                                    }).catch((error)=>{
+                                        alert(error)
+                                    })
                                 },
                             }}
                         />
@@ -74,17 +90,19 @@ const HomeScreen = (props) => {
                             />
                             <Button title="Post" type="outline" onPress={async function () {
 
-                                let name = await AsyncStorage.getItem("myname")
+                                let name = firebase.auth().currentUser.displayName
+                                 let ref = firebase.database().ref("Posts").push()
                                 let value = {
                                     postedBy: name,
                                     text: post,
-                                    postID: Date.now()
+                                    postID: ref.key
                                 }
-
-
-                                await storePost("post", value)
-                                loadPosts()
-                                console.log("posted")
+                                ref.set(value).then(()=>{
+                                    alert("Your post Id "+ ref.key)
+                                }).catch((error)=>{
+                                    alert(error)
+                                })
+                                await loadPosts()
                             }}/>
                         </Card>
 
