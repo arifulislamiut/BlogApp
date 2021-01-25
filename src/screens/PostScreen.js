@@ -5,7 +5,6 @@ import {AuthContext} from "../providers/AuthProvider";
 import PostCard from "../components/PostCard";
 import CommentCard from "../components/CommentCard";
 import {Entypo} from "@expo/vector-icons";
-import {getPost, storePost} from "../functions/AsyncStorageFunctions";
 import * as firebase from "firebase";
 
 const PostScreen = ({route}) => {
